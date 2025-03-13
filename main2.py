@@ -1,9 +1,3 @@
-# Сделать так, чтобы приветствие менялось в зависимости от времени суток:
-# • 6:00–12:00 → “Доброе утро, [имя]!” 
-# • 12:00–18:00 → “Добрый день, [имя]!” 
-# • 18:00–24:00 → “Добрый вечер, [имя]!” 
-# • 0:00–6:00 → “Доброй ночи, [имя]!”
-
 import flet as ft
 import datetime 
 
@@ -30,6 +24,7 @@ def main(page: ft.Page):
             else:
                 greeting_text.value = f'Good night, {name}!'
             greet_button.text = 'Click me again!'
+
             name_input.value = ''
 
             current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
