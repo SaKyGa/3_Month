@@ -1,5 +1,8 @@
+# При нажатии на кнопку в поле ввода появляется случайное имя из списка 
+# (Алексей, Мария, Иван, Ольга и т. д.).
 import flet as ft
-from datetime import datetime
+import datetime
+import random
 
 def main(page: ft.Page):
     page.title = "Моё первое приложение"
@@ -7,10 +10,13 @@ def main(page: ft.Page):
     
     # greeting_text = ft.Text("Привет, мир!")
 
+    names = ["Алексей", "Мария", "Иван", "Ольга"]
+    name_text = ft.Text("Нажми на кнопку")
+
     greeting_text = ft.Text(
         "Привет, мир!", 
         size=20,
-        width=ft.FontWeight.BOLD,
+        weight=ft.FontWeight.BOLD,
         opacity=1, 
         animate_opacity=ft.Animation(600, 'ease_in_out'),
         # 600 = 0.6сек
@@ -29,28 +35,44 @@ def main(page: ft.Page):
                            opacity=1,
                            animate_opacity=ft.Animation(700, 'ease_in_out'))
     
+    
+    
 
     def on_button_click(e):
         name = name_input.value.strip()
 
         if name:
-            greeting_text.value = f"Привет, {name}!"
-            greeting_text.scale = 1.2
+            current_hour = datetime.datetime.now().hour
+            if 6 <= current_hour < 12:
+                greeting_text.color = ft.colors.YELLOW
+                greeting_text.value = f"Доброе утро, {name}!"
+            elif 12 <= current_hour < 18:
+                greeting_text.color = ft.colors.ORANGE
+                greeting_text.value = f"Добрый день, {name}!"
+            elif 18 <= current_hour < 24:
+                greeting_text.color = ft.colors.RED
+                greeting_text.value = f"Добрый вечер, {name}!"
+            else:
+                greeting_text.color = ft.colors.BLUE
+                greeting_text.value = f"Доброй ночи, {name}!"
+                
+            greeting_text.animate_scale = ft.Animation(500, 'bounce_out')
             greeting_text.opacity = 1
             greet_button.text = 'Поздороваться снова'
             greet_button.bgcolor = ft.colors.GREEN_400
             name_input.value = ''
 
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             greeting_history.append(f"{timestamp}: {name}")
             history_text.value = "История приветствий:\n" + "\n".join(greeting_history)
             history_text.opacity = 1
         else:
             greeting_text.value = "Пожалуйста, введите ваше имя!"
+            greeting_text.opacity = 1
 
         page.update()
 
-    name_input = ft.TextField(label="Введите ваше имя:", autofocus=True, on_submit=on_button_click)
+    name_input = ft.TextField(label="Введите ваше имя:", multiline=True, on_submit=on_button_click)
 
     def clear_history(e):
         greeting_history.clear()
@@ -65,6 +87,16 @@ def main(page: ft.Page):
 
         page.update()
 
+    def generate_name(e):
+        random_name = random.choice(names)
+        name = name_input.value.strip()
+        if name :
+            name_input.value = f"{name}, {random_name}"
+        else:
+            name_input.value = random_name    
+        page.update()
+
+
 
     theme_button = ft.IconButton(icon=ft.icons.BRIGHTNESS_6, tooltip="Сменить тему", on_click=toggle_theme)
 
@@ -72,6 +104,8 @@ def main(page: ft.Page):
     clear_button = ft.TextButton("Очистить историю", on_click=clear_history)
 
     clear_button_icon = ft.IconButton(icon=ft.icons.DELETE, tooltip="Очиститка", on_click=clear_history)
+
+    names_button = ft.ElevatedButton("Случайное имя", on_click=generate_name)
 
 
     # greet_button = ft.ElevatedButton("Поздороваться", on_click=on_button_click)
@@ -97,13 +131,13 @@ def main(page: ft.Page):
                 ft.Row([theme_button], alignment=ft.MainAxisAlignment.CENTER),
                 greeting_text,
                 name_input,
+                names_button,
                 ft.Row([greet_button, clear_button_icon], alignment=ft.MainAxisAlignment.CENTER),
             ],
             alignment=ft.MainAxisAlignment.CENTER,  
             horizontal_alignment=ft.CrossAxisAlignment.CENTER 
         ),
         history_text
-
     )
 
 
